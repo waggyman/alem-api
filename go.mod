@@ -1,4 +1,4 @@
-module waggyman/golang-attend
+module github.com/waggyman/alem-api
 
 go 1.20
 
