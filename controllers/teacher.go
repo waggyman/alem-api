@@ -8,20 +8,9 @@ import (
 	"github.com/waggyman/alem-api/models"
 )
 
-// type teacher struct {
-// 	ID   string `json:"id"`
-// 	Code string `json:"code"`
-// 	Name string `json:"name"`
-// }
-
-// var teachers = []teacher{
-// 	{ID: "1", Code: "002341", Name: "Junaedi M.A"},
-// 	{ID: "2", Code: "002342", Name: "Fahrul S.A, M.A"},
-// 	{ID: "3", Code: "002343", Name: "Akhmad Deedat M.A"},
-// }
-
 func GetTeachers(c *gin.Context) {
-	teachers := make([]models.Teacher, 0)
+	// teachers := make([]models.Teacher, 0)
+	teachers := models.ListTeacherMongo()
 	c.IndentedJSON(http.StatusOK, teachers)
 }
 
