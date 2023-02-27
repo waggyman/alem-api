@@ -1,13 +1,17 @@
 package controllers
+
 import (
-    "github.com/gin-gonic/gin"
-    "net/http"
+	"fmt"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/waggyman/alem-api/models"
 )
 
 type teacher struct {
-	ID 		string `json:"id"`
-	Code	string `json:"code"`
-	Name 	string `json:"name"`
+	ID   string `json:"id"`
+	Code string `json:"code"`
+	Name string `json:"name"`
 }
 
 var teachers = []teacher{
@@ -16,30 +20,35 @@ var teachers = []teacher{
 	{ID: "3", Code: "002343", Name: "Akhmad Deedat M.A"},
 }
 
-func GetTeachers (c *gin.Context) {
+func GetTeachers(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, teachers)
 }
 
-func StoreTeacher (c *gin.Context) {
-	var newTeacher teacher
+func StoreTeacher(c *gin.Context) {
+	res := models.StoreTeacherMongo()
+	// if err != nil {
+	// 	fmt.Println("ADA ERROR DONG %v", err)
+	// }
+	fmt.Println(res)
+	// var newTeacher teacher
 
-	if err := c.BindJSON(&newTeacher); err != nil {
-		return
-	}
+	// if err := c.BindJSON(&newTeacher); err != nil {
+	// 	return
+	// }
 
-	teachers = append(teachers, newTeacher)
-	c.IndentedJSON(http.StatusCreated, gin.H{"message": "New Teacher Added", "data": newTeacher})
+	// teachers = append(teachers, newTeacher)
+	c.IndentedJSON(http.StatusCreated, gin.H{"message": "New Teacher Added"})
 }
 
-func GetTeacherByID (c *gin.Context) {
+func GetTeacherByID(c *gin.Context) {
 	id := c.Param("id")
 	var teacherFound teacher
-	for _, teacher := range	teachers {
+	for _, teacher := range teachers {
 		if teacher.ID == id {
 			teacherFound = teacher
 		}
 	}
-	
+
 	if (teacher{}) == teacherFound {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Teacher not found"})
 		return
@@ -47,7 +56,7 @@ func GetTeacherByID (c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, teacherFound)
 }
 
-func DeleteTeacherByID (c *gin.Context) {
+func DeleteTeacherByID(c *gin.Context) {
 	id := c.Param("id")
 	var foundIndex int = -1
 	for i, teacher := range teachers {
@@ -56,12 +65,12 @@ func DeleteTeacherByID (c *gin.Context) {
 		}
 	}
 
-	if (foundIndex < 0) {
+	if foundIndex < 0 {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Teacher not found"})
-		return		
+		return
 	}
 	newTeachers := make([]teacher, 0)
 	newTeachers = append(newTeachers, teachers[:foundIndex]...)
-	teachers = append(newTeachers, teachers[foundIndex + 1:]...)
+	teachers = append(newTeachers, teachers[foundIndex+1:]...)
 	c.IndentedJSON(http.StatusOK, teachers)
 }
