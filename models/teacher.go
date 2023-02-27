@@ -14,10 +14,10 @@ type Teacher struct {
 	Name string `bson:"name,omitempty"`
 }
 
-func StoreTeacherMongo() *mongo.InsertManyResult {
+func StoreTeacherMongo(payload Teacher) *mongo.InsertManyResult {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	docs := []interface{}{
-		bson.D{{"code", "F02344"}, {"name", "TEST"}},
+		bson.D{{"code", payload.Code}, {"name", payload.Name}},
 	}
 	// databases, err := ConnectDatabase().ListDatabaseNames(ctx, bson.M{})
 	collection := ConnectDatabase().Database("test").Collection("teachers")
@@ -25,7 +25,6 @@ func StoreTeacherMongo() *mongo.InsertManyResult {
 	if err != nil {
 		fmt.Println("ERROR WOY %v", err)
 	}
-	fmt.Println(res)
 	// return res, insertErr
 	return res
 }
