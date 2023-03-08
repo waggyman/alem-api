@@ -9,6 +9,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -37,4 +38,9 @@ func ConnectDatabase() *mongo.Client {
 	}
 	fmt.Println(databases)
 	return client
+}
+
+func ConvertToObjId(value string) primitive.ObjectID {
+	objId, _ := primitive.ObjectIDFromHex(value)
+	return objId
 }
