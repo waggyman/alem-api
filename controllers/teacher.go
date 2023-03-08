@@ -24,37 +24,31 @@ func StoreTeacher(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, gin.H{"message": "New Teacher Added"})
 }
 
-func GetTeacherByID(c *gin.Context) {
-	// id := c.Param("id")
+func FindTeacher(c *gin.Context) {
+	id := c.Param("id")
 	var teacherFound models.Teacher
-	// for _, teacher := range teachers {
-	// 	if teacher.ID == id {
-	// 		teacherFound = teacher
-	// 	}
-	// }
-
-	// if (teacher{}) == teacherFound {
-	// 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Teacher not found"})
-	// 	return
-	// }
+	res := models.FindTeacherByIdMongo(id)
+	teacherFound = res
+	fmt.Println(res)
 	c.IndentedJSON(http.StatusOK, teacherFound)
 }
 
-func DeleteTeacherByID(c *gin.Context) {
-	// id := c.Param("id")
-	// var foundIndex int = -1
-	// for i, teacher := range teachers {
-	// 	if teacher.ID == id {
-	// 		foundIndex = i
-	// 	}
-	// }
+func UpdateTeacher(c *gin.Context) {
+	id := c.Param("id")
+	var payload models.Teacher
+	if err := c.BindJSON(&payload); err != nil {
+		return
+	}
+	updatedTeacher := models.UpdateTeacherById(id, payload)
+	c.IndentedJSON(http.StatusOK, updatedTeacher)
+}
 
-	// if foundIndex < 0 {
-	// 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Teacher not found"})
-	// 	return
-	// }
-	// newTeachers := make([]teacher, 0)
-	// newTeachers = append(newTeachers, teachers[:foundIndex]...)
-	// teachers = append(newTeachers, teachers[foundIndex+1:]...)
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "AAAA"})
+func RemoveTeacher(c *gin.Context) {
+	id := c.Param("id")
+	res := models.DeleteTeacherByID(id)
+	message := "Successfully Deleted"
+	if !res {
+		message = "Unsuccessfully Deleted"
+	}
+	c.IndentedJSON(http.StatusNoContent, gin.H{"message": message})
 }
