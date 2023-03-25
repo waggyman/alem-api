@@ -16,6 +16,8 @@ func main() {
 	router.GET("/teachers/:id", controllers.FindTeacher)
 	router.PATCH("/teachers/:id", controllers.UpdateTeacher)
 	router.DELETE("/teachers/:id", controllers.RemoveTeacher)
+	router.POST("/teachers/:id/set-subject", controllers.SetSubjectToTeacher)
 
+	router.POST("/subjects", controllers.CreateSubject)
 	router.Run("localhost:8000")
 }
