@@ -8,6 +8,12 @@ import (
 	"github.com/waggyman/alem-api/models"
 )
 
+type SetSubjectParams struct {
+	Assign   []string `bson:"set,omitempty"`
+	Unassign []string `bson:"unset,omitempty"`
+	Set      []string `bson:"set,omitempty"`
+}
+
 func GetTeachers(c *gin.Context) {
 	// teachers := make([]models.Teacher, 0)
 	teachers := models.ListTeacherMongo()
@@ -51,4 +57,43 @@ func RemoveTeacher(c *gin.Context) {
 		message = "Unsuccessfully Deleted"
 	}
 	c.IndentedJSON(http.StatusNoContent, gin.H{"message": message})
+}
+
+func SetSubjectToTeacher(c *gin.Context) {
+	id := c.Param("id")
+	var payload SetSubjectParams
+	if err := c.BindJSON(&payload); err != nil {
+		return
+	}
+	currentTeacher := models.FindTeacherByIdMongo(id)
+	// if (len(payload.Assign) > 0) {
+	if len(payload.Set) > 0 {
+		for _, v := range payload.Set {
+			foundSubject := models.GetSubjectByID(v)
+			if (foundSubject == models.Subject{}) {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"ERROR": "Subject Not Found"})
+				return
+			}
+		}
+	} else {
+		for _, v := range payload.Assign {
+			foundSubject := models.GetSubjectByID(v)
+			fmt.Println(v)
+			if (foundSubject == models.Subject{}) {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"ERROR": "Subject Not Found"})
+				return
+			}
+		}
+
+		for _, v := range payload.Unassign {
+			foundSubject := models.GetSubjectByID(v)
+			if (foundSubject == models.Subject{}) {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"ERROR": "Subject Not Found"})
+				return
+			}
+		}
+	}
+	// }
+	fmt.Println(currentTeacher)
+	c.IndentedJSON(http.StatusOK, payload)
 }
