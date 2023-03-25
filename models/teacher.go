@@ -12,18 +12,19 @@ import (
 var collection = ConnectDatabase().Database("test").Collection("teachers")
 
 type Teacher struct {
-	Id   string `bson:"_id,omitempty"`
-	Code string `bson:"code,omitempty"`
-	Name string `bson:"name,omitempty"`
+	Id       string `bson:"_id,omitempty"`
+	Code     string `bson:"code,omitempty"`
+	Name     string `bson:"name,omitempty"`
+	Subjects []int  `bson:"subjects,omitempty"`
 }
 
 func StoreTeacherMongo(payload Teacher) *mongo.InsertOneResult {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	docs := []Teacher{{
+	// docs := []
+	res, err := collection.InsertOne(ctx, Teacher{
 		Code: payload.Code,
 		Name: payload.Name,
-	}}
-	res, err := collection.InsertOne(ctx, docs)
+	})
 	if err != nil {
 		fmt.Println("ERROR WOY %v", err)
 	}
@@ -59,10 +60,7 @@ func UpdateTeacherById(id string, payload Teacher) Teacher {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	_, err := collection.UpdateOne(ctx, bson.D{{"_id", ConvertToObjId(id)}}, bson.D{
 		{
-			"$set", Teacher{
-				Code: payload.Code,
-				Name: payload.Name,
-			},
+			"$set", payload,
 		},
 	})
 	if err != nil {
