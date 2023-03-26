@@ -71,13 +71,16 @@ func SetSubjectToTeacher(c *gin.Context) {
 
 	// if (len(payload.Assign) > 0) {
 	if len(payload.Set) > 0 {
+		subjects := []string{}
 		for _, v := range payload.Set {
 			foundSubject := models.GetSubjectByID(v)
 			if (foundSubject == models.Subject{}) {
 				c.IndentedJSON(http.StatusInternalServerError, gin.H{"ERROR": "Subject Not Found"})
 				return
 			}
+			subjects = append(subjects, v)
 		}
+		currentSubject = subjects
 	} else {
 		for _, v := range payload.Assign {
 			foundSubject := models.GetSubjectByID(v)
