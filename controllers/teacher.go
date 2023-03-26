@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/waggyman/alem-api/models"
+	"github.com/waggyman/alem-api/utilities"
 )
 
 type SetSubjectParams struct {
@@ -66,6 +67,8 @@ func SetSubjectToTeacher(c *gin.Context) {
 		return
 	}
 	currentTeacher := models.FindTeacherByIdMongo(id)
+	currentSubject := currentTeacher.Subjects
+
 	// if (len(payload.Assign) > 0) {
 	if len(payload.Set) > 0 {
 		for _, v := range payload.Set {
@@ -83,6 +86,10 @@ func SetSubjectToTeacher(c *gin.Context) {
 				c.IndentedJSON(http.StatusInternalServerError, gin.H{"ERROR": "Subject Not Found"})
 				return
 			}
+			found := utilities.InArray(v, currentSubject)
+			if found < 0 {
+				currentSubject = append(currentSubject, v)
+			}
 		}
 
 		for _, v := range payload.Unassign {
@@ -91,9 +98,16 @@ func SetSubjectToTeacher(c *gin.Context) {
 				c.IndentedJSON(http.StatusInternalServerError, gin.H{"ERROR": "Subject Not Found"})
 				return
 			}
+			found := utilities.InArray(v, currentSubject)
+			if found >= 0 {
+				currentSubject = utilities.RemoveByIndex(currentSubject, found)
+			}
 		}
 	}
-	// }
-	fmt.Println(currentTeacher)
+	currentTeacher.Subjects = currentSubject
+	models.UpdateTeacherById(id, currentTeacher)
+	// // }
+	// fmt.Println(currentTeacher)
+	// fmt.Println(currentSubject)
 	c.IndentedJSON(http.StatusOK, payload)
 }
