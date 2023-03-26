@@ -12,10 +12,10 @@ import (
 var collection = ConnectDatabase().Database("test").Collection("teachers")
 
 type Teacher struct {
-	Id       string `bson:"_id,omitempty"`
-	Code     string `bson:"code,omitempty"`
-	Name     string `bson:"name,omitempty"`
-	Subjects []int  `bson:"subjects,omitempty"`
+	Id       string   `bson:"_id,omitempty"`
+	Code     string   `bson:"code,omitempty"`
+	Name     string   `bson:"name,omitempty"`
+	Subjects []string `bson:"subjects,omitempty"`
 }
 
 func StoreTeacherMongo(payload Teacher) *mongo.InsertOneResult {
@@ -56,15 +56,24 @@ func FindTeacherByIdMongo(id string) Teacher {
 
 func UpdateTeacherById(id string, payload Teacher) Teacher {
 	var teacher Teacher
-	fmt.Println("WHAT IS NAME %v", payload.Name)
+	fmt.Println("WHAT IS NAME %v", payload.Name, payload.Code, payload.Subjects)
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	_, err := collection.UpdateOne(ctx, bson.D{{"_id", ConvertToObjId(id)}}, bson.D{
 		{
-			"$set", payload,
+			// "$set", Teacher{
+			// 	Code:     payload.Code,
+			// 	Name:     payload.Name,
+			// 	Subjects: []string{},
+			// },
+			"$set", bson.M{
+				"code":     payload.Code,
+				"name":     payload.Name,
+				"subjects": payload.Subjects,
+			},
 		},
 	})
 	if err != nil {
-		fmt.Println("ERROR UPDATE")
+		fmt.Println("ERROR UPDATE", err)
 	}
 	teacher = FindTeacherByIdMongo(id)
 	return teacher
